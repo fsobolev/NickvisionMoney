@@ -116,10 +116,13 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     gtk_popover_set_child(GTK_POPOVER(m_popoverTransferOpen), m_boxTransferOpen);
     //Transfer Help Popover
     m_popoverTransferHelp = gtk_popover_new();
-    m_lblTransferHelp = gtk_label_new(_("The transfer allows you to make a copy of the transaction\nto another account, but with the opposite type: the income\non the current account will be an expense on the target\nof the transfer, and vice versa."));
+    m_clampTransferHelp = adw_clamp_new();
+    adw_clamp_set_maximum_size(ADW_CLAMP(m_clampTransferHelp), 350);
+    m_lblTransferHelp = gtk_label_new(_("The transfer allows you to make a copy of the transaction to another account, but with the opposite type: the income on the current account will be an expense on the target of the transfer, and vice versa."));
     gtk_label_set_justify(GTK_LABEL(m_lblTransferHelp), GTK_JUSTIFY_CENTER);
     gtk_label_set_wrap(GTK_LABEL(m_lblTransferHelp), true);
-    gtk_popover_set_child(GTK_POPOVER(m_popoverTransferHelp), m_lblTransferHelp);
+    adw_clamp_set_child(ADW_CLAMP(m_clampTransferHelp), m_lblTransferHelp);
+    gtk_popover_set_child(GTK_POPOVER(m_popoverTransferHelp), m_clampTransferHelp);
     //Transfer Box
     m_boxTransfer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_widget_set_valign(m_boxTransfer, GTK_ALIGN_CENTER);

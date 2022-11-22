@@ -60,6 +60,7 @@ namespace NickvisionMoney::UI::Views
 		GtkWidget* m_boxTransferOpen{ nullptr };
 		GtkWidget* m_popoverTransferOpen{ nullptr };
 		GtkWidget* m_popoverTransferHelp{ nullptr };
+		GtkWidget* m_clampTransferHelp{ nullptr };
 		GtkWidget* m_lblTransferHelp{ nullptr };
 		GtkWidget* m_boxTransfer{ nullptr };
 		GtkWidget* m_lblTransferTarget{ nullptr };
