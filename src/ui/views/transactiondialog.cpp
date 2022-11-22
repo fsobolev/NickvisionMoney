@@ -97,6 +97,36 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowColor), m_btnColor);
     adw_action_row_set_activatable_widget(ADW_ACTION_ROW(m_rowColor), m_btnColor);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(m_preferencesGroupGroupColor), m_rowColor);
+    //Transfer Preferences Group
+    m_preferencesGroupTransfer = adw_preferences_group_new();
+    gtk_box_append(GTK_BOX(m_boxMain), m_preferencesGroupTransfer);
+    //Transfer Popover
+    m_popoverTransferHelp = gtk_popover_new();
+    m_lblTransferHelp = gtk_label_new(_("The transfer allows you to make a copy of the transaction\nto another account, but with the opposite type: the income\non the current account will be an expense on the target\nof the transfer, and vice versa."));
+    gtk_label_set_justify(GTK_LABEL(m_lblTransferHelp), GTK_JUSTIFY_CENTER);
+    gtk_label_set_wrap(GTK_LABEL(m_lblTransferHelp), true);
+    gtk_popover_set_child(GTK_POPOVER(m_popoverTransferHelp), m_lblTransferHelp);
+    //Transfer Box
+    m_boxTransfer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_valign(m_boxTransfer, GTK_ALIGN_CENTER);
+    m_lblTransferTarget = gtk_label_new("");
+    gtk_box_append(GTK_BOX(m_boxTransfer), m_lblTransferTarget);
+    m_btnTransferOpen = gtk_button_new_from_icon_name("document-open-symbolic");
+    gtk_widget_add_css_class(m_btnTransferOpen, "flat");
+    gtk_widget_set_tooltip_text(m_btnTransferOpen, _("Open Account For Transfer"));
+    gtk_box_append(GTK_BOX(m_boxTransfer), m_btnTransferOpen);
+    m_btnTransferHelp = gtk_menu_button_new();
+    gtk_menu_button_set_icon_name(GTK_MENU_BUTTON(m_btnTransferHelp), "help-faq-symbolic");
+    gtk_menu_button_set_popover(GTK_MENU_BUTTON(m_btnTransferHelp), m_popoverTransferHelp);
+    gtk_widget_add_css_class(m_btnTransferHelp, "flat");
+    gtk_widget_set_tooltip_text(m_btnTransferHelp, _("Transfer Help"));
+    gtk_box_append(GTK_BOX(m_boxTransfer), m_btnTransferHelp);
+    //Transfer
+    m_rowTransfer = adw_action_row_new();
+    adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_boxTransfer);
+    adw_action_row_set_activatable_widget(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferOpen);
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_rowTransfer), _("Transfer"));
+    adw_preferences_group_add(ADW_PREFERENCES_GROUP(m_preferencesGroupTransfer), m_rowTransfer);
     //Amount Event Controller Key
     m_eventAmountKey = gtk_event_controller_key_new();
     g_signal_connect(m_eventAmountKey, "key-released", G_CALLBACK((void (*)(GtkEventControllerKey*, unsigned int, unsigned int, GdkModifierType, gpointer))([](GtkEventControllerKey*, unsigned int keyval, unsigned int, GdkModifierType state, gpointer data) { reinterpret_cast<TransactionDialog*>(data)->onAmountKeyReleased(keyval, state); })), this);
