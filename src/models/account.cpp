@@ -367,7 +367,7 @@ bool Account::exportAsCSV(const std::string& path)
     std::ofstream file{ path };
     if(file.is_open())
     {
-        file << "ID,Date,Description,Type,RepeatInterval,Amount,RGBA,Group,GroupName,GroupDescription\n";
+        file << "ID,Date,Description,Type,RepeatInterval,Amount,RGBA,TransferPath,Group,GroupName,GroupDescription\n";
         for(const std::pair<const unsigned int, Transaction>& pair : m_transactions)
         {
             file << pair.second.getId() << ";";
@@ -500,6 +500,7 @@ int Account::importFromCSV(const std::string& path)
             transaction.setAmount(amount);
             transaction.setGroupId(gid);
             transaction.setRGBA(rgba);
+            transaction.setTransferPath(transferPath);
             addTransaction(transaction);
             //Add Group if needed
             if (getGroupById(gid) == std::nullopt && gid != -1)

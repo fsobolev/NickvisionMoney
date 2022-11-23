@@ -15,6 +15,12 @@ TransactionDialogController::TransactionDialogController(unsigned int newId, con
     }
     std::sort(m_groupNames.begin(), m_groupNames.end());
     m_groupNames.insert(m_groupNames.begin(), _("None"));
+
+    if(!m_transaction.getTransferPath().empty())
+    {
+        m_transferList.push_back(m_transaction.getTransferPath());
+    }
+    m_transferList.insert(m_transferList.begin(), _("None"));
 }
 
 TransactionDialogController::TransactionDialogController(const Transaction& transaction, const std::map<unsigned int, Group>& groups, const std::locale& locale) : m_response{ "cancel" }, m_locale{ locale }, m_transaction{ transaction }, m_groups{ groups }
@@ -97,14 +103,9 @@ const std::string& TransactionDialogController::getRGBA() const
     return m_transaction.getRGBA();
 }
 
-std::vector<std::string> TransactionDialogController::getTransferList() const
+const std::vector<std::string>& TransactionDialogController::getTransferList() const
 {
-    std::vector<std::string> list = {""};
-    if(m_transaction.getTransferPath() != "")
-    {
-        list.push_back(m_transaction.getTransferPath());
-    }
-    return list;
+    return m_transferList;
 }
 
 std::string TransactionDialogController::getAmountAsString() const

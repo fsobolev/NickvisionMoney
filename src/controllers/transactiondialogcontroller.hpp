@@ -125,7 +125,7 @@ namespace NickvisionMoney::Controllers
         	 *
         	 * @returns The list of filepaths of accounts for transfer
         	 */
-        	std::vector<std::string> getTransferList() const;
+        	const std::vector<std::string>& getTransferList() const;
 		/**
 		 * Gets the amount of the transaction as a string
 		 *
@@ -158,5 +158,6 @@ namespace NickvisionMoney::Controllers
 		NickvisionMoney::Models::Transaction m_transaction;
 		std::map<unsigned int, NickvisionMoney::Models::Group> m_groups;
 		std::vector<std::string> m_groupNames;
+		std::vector<std::string> m_transferList;
 	};
 }

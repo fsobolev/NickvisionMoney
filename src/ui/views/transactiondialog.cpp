@@ -127,11 +127,7 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     for(size_t i = 0; i < m_controller.getTransferList().size(); i++)
     {
         transferList[i] = m_controller.getTransferList()[i].c_str();
-        if(strcmp(transferList[i], "") == 0)
-        {
-            transferList[i] = _("None");
-        }
-        else
+        if(i > 0)
         {
             transferList[i] = g_file_get_basename(g_file_new_for_path(transferList[i]));
         }
