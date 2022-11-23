@@ -97,13 +97,14 @@ const std::string& TransactionDialogController::getRGBA() const
     return m_transaction.getRGBA();
 }
 
-const std::vector<std::string>& TransactionDialogController::getTransferList() const
+std::vector<std::string> TransactionDialogController::getTransferList() const
 {
     std::vector<std::string> list = {""};
     if(m_transaction.getTransferPath() != "")
     {
         list.push_back(m_transaction.getTransferPath());
     }
+    return list;
 }
 
 std::string TransactionDialogController::getAmountAsString() const

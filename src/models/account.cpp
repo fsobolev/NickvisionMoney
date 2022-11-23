@@ -291,7 +291,7 @@ bool Account::addTransaction(const Transaction& transaction)
 
 bool Account::updateTransaction(const Transaction& transaction)
 {
-    SQLite::Statement qryUpdate{ *m_db, "UPDATE transactions SET date = ?, description = ?, type = ?, repeat = ?, amount = ?, gid = ?, rgba = ? WHERE id = " + std::to_string(transaction.getId()) };
+    SQLite::Statement qryUpdate{ *m_db, "UPDATE transactions SET date = ?, description = ?, type = ?, repeat = ?, amount = ?, gid = ?, rgba = ?, transfer = ? WHERE id = " + std::to_string(transaction.getId()) };
     std::stringstream strAmount;
     strAmount << transaction.getAmount();
     qryUpdate.bind(1, boost::gregorian::to_iso_extended_string(transaction.getDate()));

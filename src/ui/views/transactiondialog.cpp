@@ -127,7 +127,7 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     for(size_t i = 0; i < m_controller.getTransferList().size(); i++)
     {
         transferList[i] = m_controller.getTransferList()[i].c_str();
-        if(transferList[i] == "")
+        if(strcmp(transferList[i], "") == 0)
         {
             transferList[i] = _("None");
         }
