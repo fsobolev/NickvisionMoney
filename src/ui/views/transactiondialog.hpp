@@ -54,19 +54,12 @@ namespace NickvisionMoney::UI::Views
 		GtkWidget* m_rowColor{ nullptr };
 		GtkWidget* m_btnColor{ nullptr };
 		GtkWidget* m_preferencesGroupTransfer{ nullptr };
-		GtkWidget* m_lblTransferNoRecent{ nullptr };
-		GtkWidget* m_btnContentTransferOpenFile{ nullptr };
-		GtkWidget* m_btnTransferOpenFile{ nullptr };
-		GtkWidget* m_boxTransferOpen{ nullptr };
-		GtkWidget* m_popoverTransferOpen{ nullptr };
+		GtkWidget* m_rowTransfer{ nullptr };
+		GtkWidget* m_btnTransferOpen{ nullptr };
+		GtkWidget* m_btnTransferHelp{ nullptr };
 		GtkWidget* m_popoverTransferHelp{ nullptr };
 		GtkWidget* m_clampTransferHelp{ nullptr };
 		GtkWidget* m_lblTransferHelp{ nullptr };
-		GtkWidget* m_boxTransfer{ nullptr };
-		GtkWidget* m_lblTransferTarget{ nullptr };
-		GtkWidget* m_btnTransferHelp{ nullptr };
-		GtkWidget* m_btnTransferOpen{ nullptr };
-		GtkWidget* m_rowTransfer{ nullptr };
 		GtkEventController* m_eventAmountKey{ nullptr };
 		/**
     	 * Sets the response

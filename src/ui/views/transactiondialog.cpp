@@ -100,21 +100,12 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     //Transfer Preferences Group
     m_preferencesGroupTransfer = adw_preferences_group_new();
     gtk_box_append(GTK_BOX(m_boxMain), m_preferencesGroupTransfer);
-    //Transfer Open Popover
-    m_boxTransferOpen = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    m_lblTransferNoRecent = gtk_label_new(_("No recent accounts"));
-    gtk_label_set_justify(GTK_LABEL(m_lblTransferNoRecent), GTK_JUSTIFY_CENTER);
-    gtk_widget_set_size_request(m_lblTransferNoRecent, -1, 35);
-    gtk_box_append(GTK_BOX(m_boxTransferOpen), m_lblTransferNoRecent);
-    m_btnContentTransferOpenFile = adw_button_content_new();
-    adw_button_content_set_icon_name(ADW_BUTTON_CONTENT(m_btnContentTransferOpenFile), "document-open-symbolic");
-    adw_button_content_set_label(ADW_BUTTON_CONTENT(m_btnContentTransferOpenFile), _("Open Account File"));
-    m_btnTransferOpenFile = gtk_button_new();
-    gtk_button_set_child(GTK_BUTTON(m_btnTransferOpenFile), m_btnContentTransferOpenFile);
-    gtk_box_append(GTK_BOX(m_boxTransferOpen), m_btnTransferOpenFile);
-    m_popoverTransferOpen = gtk_popover_new();
-    gtk_popover_set_child(GTK_POPOVER(m_popoverTransferOpen), m_boxTransferOpen);
-    //Transfer Help Popover
+    //Transfer
+    m_btnTransferOpen = gtk_button_new();
+    gtk_widget_set_valign(m_btnTransferOpen, GTK_ALIGN_CENTER);
+    gtk_widget_add_css_class(m_btnTransferOpen, "flat");
+    gtk_button_set_icon_name(GTK_BUTTON(m_btnTransferOpen), "document-open-symbolic");
+    gtk_widget_set_tooltip_text(m_btnTransferOpen, _("Open Other Account"));
     m_popoverTransferHelp = gtk_popover_new();
     m_clampTransferHelp = adw_clamp_new();
     adw_clamp_set_maximum_size(ADW_CLAMP(m_clampTransferHelp), 350);
@@ -123,28 +114,17 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     gtk_label_set_wrap(GTK_LABEL(m_lblTransferHelp), true);
     adw_clamp_set_child(ADW_CLAMP(m_clampTransferHelp), m_lblTransferHelp);
     gtk_popover_set_child(GTK_POPOVER(m_popoverTransferHelp), m_clampTransferHelp);
-    //Transfer Box
-    m_boxTransfer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_widget_set_valign(m_boxTransfer, GTK_ALIGN_CENTER);
-    m_lblTransferTarget = gtk_label_new("");
-    gtk_box_append(GTK_BOX(m_boxTransfer), m_lblTransferTarget);
-    m_btnTransferOpen = gtk_menu_button_new();
-    gtk_menu_button_set_icon_name(GTK_MENU_BUTTON(m_btnTransferOpen), "wallet2-symbolic");
-    gtk_menu_button_set_popover(GTK_MENU_BUTTON(m_btnTransferOpen), m_popoverTransferOpen);
-    gtk_widget_add_css_class(m_btnTransferOpen, "flat");
-    gtk_widget_set_tooltip_text(m_btnTransferOpen, _("Open Account For Transfer"));
-    gtk_box_append(GTK_BOX(m_boxTransfer), m_btnTransferOpen);
     m_btnTransferHelp = gtk_menu_button_new();
+    gtk_widget_set_valign(m_btnTransferHelp, GTK_ALIGN_CENTER);
+    gtk_widget_add_css_class(m_btnTransferHelp, "flat");
     gtk_menu_button_set_icon_name(GTK_MENU_BUTTON(m_btnTransferHelp), "help-faq-symbolic");
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(m_btnTransferHelp), m_popoverTransferHelp);
-    gtk_widget_add_css_class(m_btnTransferHelp, "flat");
-    gtk_widget_set_tooltip_text(m_btnTransferHelp, _("Transfer Help"));
-    gtk_box_append(GTK_BOX(m_boxTransfer), m_btnTransferHelp);
-    //Transfer
-    m_rowTransfer = adw_action_row_new();
-    adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_boxTransfer);
-    adw_action_row_set_activatable_widget(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferOpen);
+    gtk_widget_set_tooltip_text(m_btnTransferHelp, _("About Transfer"));
+    m_rowTransfer = adw_combo_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_rowTransfer), _("Transfer"));
+    adw_combo_row_set_model(ADW_COMBO_ROW(m_rowTransfer), G_LIST_MODEL(gtk_string_list_new(new const char*[3]{ "None", "Test", nullptr })));
+    adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferOpen);
+    adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferHelp);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(m_preferencesGroupTransfer), m_rowTransfer);
     //Amount Event Controller Key
     m_eventAmountKey = gtk_event_controller_key_new();
