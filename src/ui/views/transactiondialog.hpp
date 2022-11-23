@@ -84,6 +84,10 @@ namespace NickvisionMoney::UI::Views
 		 */
 		void onAmountKeyReleased(unsigned int keyval, GdkModifierType state);
 		/**
+		 * Occurs when there's a need to update the list of Transfer paths
+		 */
+		void updateTransferList();
+		/**
 		 * Occurs when a file for transfer should be selected
 		 */
 		void onTransferSelectFile();

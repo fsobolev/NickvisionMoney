@@ -123,18 +123,7 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     gtk_widget_set_tooltip_text(m_btnTransferHelp, _("About Transfer"));
     m_rowTransfer = adw_combo_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_rowTransfer), _("Transfer"));
-    const char** transferList{ new const char*[m_controller.getTransferList().size() + 1] };
-    for(size_t i = 0; i < m_controller.getTransferList().size(); i++)
-    {
-        transferList[i] = m_controller.getTransferList()[i].c_str();
-        if(i > 0)
-        {
-            transferList[i] = g_file_get_basename(g_file_new_for_path(transferList[i]));
-        }
-    }
-    transferList[m_controller.getTransferList().size()] = nullptr;
-    m_strListTransfer = gtk_string_list_new(transferList);
-    adw_combo_row_set_model(ADW_COMBO_ROW(m_rowTransfer), G_LIST_MODEL(m_strListTransfer));
+    updateTransferList();
     adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferOpen);
     adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferHelp);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(m_preferencesGroupTransfer), m_rowTransfer);
@@ -264,6 +253,22 @@ void TransactionDialog::onAmountKeyReleased(unsigned int keyval, GdkModifierType
     }
 }
 
+void TransactionDialog::updateTransferList()
+{
+    const char** transferList{ new const char*[m_controller.getTransferList().size() + 1] };
+    for(size_t i = 0; i < m_controller.getTransferList().size(); i++)
+    {
+        transferList[i] = m_controller.getTransferList()[i].c_str();
+        if(i > 0)
+        {
+            transferList[i] = g_file_get_basename(g_file_new_for_path(transferList[i]));
+        }
+    }
+    transferList[m_controller.getTransferList().size()] = nullptr;
+    m_strListTransfer = gtk_string_list_new(transferList);
+    adw_combo_row_set_model(ADW_COMBO_ROW(m_rowTransfer), G_LIST_MODEL(m_strListTransfer));
+}
+
 void TransactionDialog::onTransferSelectFile()
 {
     gtk_popover_popdown(GTK_POPOVER(m_popoverTransferHelp));
@@ -281,10 +286,11 @@ void TransactionDialog::onTransferSelectFile()
             TransactionDialog* transactionDialog{ reinterpret_cast<TransactionDialog*>(data) };
             GFile* file{ gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)) };
             std::string path{ g_file_get_path(file) };
-            //transactionDialog->m_controller.addToTransferList(path);
+            transactionDialog->m_controller.addPathToTransferList(path);
             g_object_unref(file);
         }
         g_object_unref(dialog);
     })), this);
     gtk_native_dialog_show(GTK_NATIVE_DIALOG(openFileDialog));
+    updateTransferList();
 }

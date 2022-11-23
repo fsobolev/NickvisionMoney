@@ -108,6 +108,18 @@ const std::vector<std::string>& TransactionDialogController::getTransferList() c
     return m_transferList;
 }
 
+void TransactionDialogController::addPathToTransferList(const std::string& path)
+{
+    for(std::string i : m_transferList)
+    {
+        if(i == path)
+        {
+            return;
+        }
+    }
+    m_transferList.push_back(path);
+}
+
 std::string TransactionDialogController::getAmountAsString() const
 {
     return MoneyHelpers::boostMoneyToLocaleString(m_transaction.getAmount(), m_locale);

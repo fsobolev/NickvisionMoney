@@ -126,6 +126,12 @@ namespace NickvisionMoney::Controllers
         	 * @returns The list of filepaths of accounts for transfer
         	 */
         	const std::vector<std::string>& getTransferList() const;
+        	/**
+        	 * Adds a path to the Transfer list.
+        	 *
+        	 * @param path The path to account file
+        	 */
+        	void addPathToTransferList(const std::string& path);
 		/**
 		 * Gets the amount of the transaction as a string
 		 *
