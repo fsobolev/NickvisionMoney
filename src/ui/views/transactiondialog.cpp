@@ -106,10 +106,11 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     gtk_widget_add_css_class(m_btnTransferOpen, "flat");
     gtk_button_set_icon_name(GTK_BUTTON(m_btnTransferOpen), "document-open-symbolic");
     gtk_widget_set_tooltip_text(m_btnTransferOpen, _("Open Other Account"));
+    g_signal_connect(m_btnTransferOpen, "clicked", G_CALLBACK((void (*)(GtkButton*, gpointer))[](GtkButton*, gpointer data) { return reinterpret_cast<TransactionDialog*>(data)->onTransferSelectFile(); }), this);
     m_popoverTransferHelp = gtk_popover_new();
     m_clampTransferHelp = adw_clamp_new();
     adw_clamp_set_maximum_size(ADW_CLAMP(m_clampTransferHelp), 350);
-    m_lblTransferHelp = gtk_label_new(_("The transfer allows you to make a copy of the transaction to another account, but with the opposite type: the income on the current account will be an expense on the target of the transfer, and vice versa."));
+    m_lblTransferHelp = gtk_label_new(_("The transfer allows you to make a copy of the transaction to another account, but with the opposite type: the income on the current account will be an expense on the target of the transfer, and vice versa. Other currently opened accounts will appear in the drop down list."));
     gtk_label_set_justify(GTK_LABEL(m_lblTransferHelp), GTK_JUSTIFY_CENTER);
     gtk_label_set_wrap(GTK_LABEL(m_lblTransferHelp), true);
     adw_clamp_set_child(ADW_CLAMP(m_clampTransferHelp), m_lblTransferHelp);
@@ -122,7 +123,22 @@ TransactionDialog::TransactionDialog(GtkWindow* parent, NickvisionMoney::Control
     gtk_widget_set_tooltip_text(m_btnTransferHelp, _("About Transfer"));
     m_rowTransfer = adw_combo_row_new();
     adw_preferences_row_set_title(ADW_PREFERENCES_ROW(m_rowTransfer), _("Transfer"));
-    adw_combo_row_set_model(ADW_COMBO_ROW(m_rowTransfer), G_LIST_MODEL(gtk_string_list_new(new const char*[3]{ "None", "Test", nullptr })));
+    const char** transferList{ new const char*[m_controller.getTransferList().size() + 1] };
+    for(size_t i = 0; i < m_controller.getTransferList().size(); i++)
+    {
+        transferList[i] = m_controller.getTransferList()[i].c_str();
+        if(transferList[i] == "")
+        {
+            transferList[i] = _("None");
+        }
+        else
+        {
+            transferList[i] = g_file_get_basename(g_file_new_for_path(transferList[i]));
+        }
+    }
+    transferList[m_controller.getTransferList().size()] = nullptr;
+    m_strListTransfer = gtk_string_list_new(transferList);
+    adw_combo_row_set_model(ADW_COMBO_ROW(m_rowTransfer), G_LIST_MODEL(m_strListTransfer));
     adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferOpen);
     adw_action_row_add_suffix(ADW_ACTION_ROW(m_rowTransfer), m_btnTransferHelp);
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(m_preferencesGroupTransfer), m_rowTransfer);
@@ -175,7 +191,12 @@ bool TransactionDialog::run()
         TransactionType type{ gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_btnIncome)) ? TransactionType::Income : TransactionType::Expense };
         GdkRGBA color;
         gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(m_btnColor), &color);
-        TransactionCheckStatus status{ m_controller.updateTransaction(g_date_time_format(gtk_calendar_get_date(GTK_CALENDAR(m_calendarDate)), "%Y-%m-%d"), gtk_editable_get_text(GTK_EDITABLE(m_rowDescription)), type, adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowRepeatInterval)), adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowGroup)), gdk_rgba_to_string(&color), gtk_editable_get_text(GTK_EDITABLE(m_rowAmount))) };
+        std::string transferPath = "";
+        if(adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowTransfer)) != 0 && adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowTransfer)) != GTK_INVALID_LIST_POSITION)
+        {
+            transferPath = m_controller.getTransferList()[(adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowTransfer)))];
+        }
+        TransactionCheckStatus status{ m_controller.updateTransaction(g_date_time_format(gtk_calendar_get_date(GTK_CALENDAR(m_calendarDate)), "%Y-%m-%d"), gtk_editable_get_text(GTK_EDITABLE(m_rowDescription)), type, adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowRepeatInterval)), adw_combo_row_get_selected(ADW_COMBO_ROW(m_rowGroup)), gdk_rgba_to_string(&color), transferPath, gtk_editable_get_text(GTK_EDITABLE(m_rowAmount))) };
         //Invalid Transaction
         if(status != TransactionCheckStatus::Valid)
         {
@@ -245,4 +266,29 @@ void TransactionDialog::onAmountKeyReleased(unsigned int keyval, GdkModifierType
             gtk_editable_set_position(GTK_EDITABLE(m_rowAmount), amountText.size() - 1);
         }
     }
+}
+
+void TransactionDialog::onTransferSelectFile()
+{
+    gtk_popover_popdown(GTK_POPOVER(m_popoverTransferHelp));
+    GtkFileChooserNative* openFileDialog{ gtk_file_chooser_native_new(_("Select Account For Transfer"), GTK_WINDOW(m_gobj), GTK_FILE_CHOOSER_ACTION_OPEN, _("_Open"), _("_Cancel")) };
+    gtk_native_dialog_set_modal(GTK_NATIVE_DIALOG(openFileDialog), true);
+    GtkFileFilter* filter{ gtk_file_filter_new() };
+    gtk_file_filter_set_name(filter, _("Money Account (*.nmoney)"));
+    gtk_file_filter_add_pattern(filter, "*.nmoney");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(openFileDialog), filter);
+    g_object_unref(filter);
+    g_signal_connect(openFileDialog, "response", G_CALLBACK((void (*)(GtkNativeDialog*, gint, gpointer))([](GtkNativeDialog* dialog, gint response_id, gpointer data)
+    {
+        if(response_id == GTK_RESPONSE_ACCEPT)
+        {
+            TransactionDialog* transactionDialog{ reinterpret_cast<TransactionDialog*>(data) };
+            GFile* file{ gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dialog)) };
+            std::string path{ g_file_get_path(file) };
+            //transactionDialog->m_controller.addToTransferList(path);
+            g_object_unref(file);
+        }
+        g_object_unref(dialog);
+    })), this);
+    gtk_native_dialog_show(GTK_NATIVE_DIALOG(openFileDialog));
 }

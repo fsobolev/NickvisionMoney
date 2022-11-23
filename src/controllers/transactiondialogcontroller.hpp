@@ -120,6 +120,12 @@ namespace NickvisionMoney::Controllers
          * @returns The rgba color of the transaction
          */
         const std::string& getRGBA() const;
+        	/**
+        	 * Gets the list of filepaths of accounts for transfer
+        	 *
+        	 * @returns The list of filepaths of accounts for transfer
+        	 */
+        	const std::vector<std::string>& getTransferList() const;
 		/**
 		 * Gets the amount of the transaction as a string
 		 *
@@ -144,7 +150,7 @@ namespace NickvisionMoney::Controllers
 		 * @param amountString The amount string
 		 * @returns The TransactionCheckStatus
 		 */
-		TransactionCheckStatus updateTransaction(const std::string& dateString, const std::string& description, NickvisionMoney::Models::TransactionType type, int repeatInterval, int groupIndex, const std::string& rgba, std::string amountString);
+		TransactionCheckStatus updateTransaction(const std::string& dateString, const std::string& description, NickvisionMoney::Models::TransactionType type, int repeatInterval, int groupIndex, const std::string& rgba, const std::string& transfer, std::string amountString);
 
 	private:
 		std::string m_response;

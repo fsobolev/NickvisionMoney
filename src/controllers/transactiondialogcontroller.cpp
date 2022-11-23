@@ -97,6 +97,14 @@ const std::string& TransactionDialogController::getRGBA() const
     return m_transaction.getRGBA();
 }
 
+const std::vector<std::string>& TransactionDialogController::getTransferList() const
+{
+    std::vector<std::string> list = {""};
+    if(m_transaction.getTransferPath() != "")
+    {
+        list.push_back(m_transaction.getTransferPath());
+    }
+}
 
 std::string TransactionDialogController::getAmountAsString() const
 {
@@ -108,7 +116,7 @@ bool TransactionDialogController::isLocaleDotDecimalSeperated() const
     return MoneyHelpers::isLocaleDotDecimalSeperated(m_locale);
 }
 
-TransactionCheckStatus TransactionDialogController::updateTransaction(const std::string& dateString, const std::string& description, TransactionType type, int repeatInterval, int groupIndex, const std::string& rgba, std::string amountString)
+TransactionCheckStatus TransactionDialogController::updateTransaction(const std::string& dateString, const std::string& description, TransactionType type, int repeatInterval, int groupIndex, const std::string& rgba, const std::string& transfer, std::string amountString)
 {
     if(description.empty())
     {
@@ -151,6 +159,7 @@ TransactionCheckStatus TransactionDialogController::updateTransaction(const std:
         }
     }
     m_transaction.setRGBA(rgba);
+    m_transaction.setTransferPath(transfer);
     m_transaction.setAmount(amount);
     return TransactionCheckStatus::Valid;
 }

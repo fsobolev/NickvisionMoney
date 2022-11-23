@@ -38,7 +38,7 @@ Account::Account(const std::string& path) : m_path{ path }, m_db{ std::make_shar
     //Load Groups
     m_db->exec("CREATE TABLE IF NOT EXISTS groups (id INTEGER PRIMARY KEY, name TEXT, description TEXT)");
     //Load Transactions
-    m_db->exec("CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY, date TEXT, description TEXT, type INTEGER, repeat INTEGER, amount TEXT, gid INTEGER, rgba TEXT)");
+    m_db->exec("CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY, date TEXT, description TEXT, type INTEGER, repeat INTEGER, amount TEXT, gid INTEGER, rgba TEXT, transfer TEXT)");
     try
     {
         m_db->exec("ALTER TABLE transactions ADD COLUMN gid INTEGER");
@@ -47,6 +47,11 @@ Account::Account(const std::string& path) : m_path{ path }, m_db{ std::make_shar
     try
     {
         m_db->exec("ALTER TABLE transactions ADD COLUMN rgba TEXT");
+    }
+    catch(...) { }
+    try
+    {
+        m_db->exec("ALTER TABLE transactions ADD COLUMN transfer TEXT");
     }
     catch(...) { }
     // Queries
@@ -260,7 +265,7 @@ unsigned int Account::getNextAvailableTransactionId() const
 
 bool Account::addTransaction(const Transaction& transaction)
 {
-    SQLite::Statement qryInsert{ *m_db, "INSERT INTO transactions (id, date, description, type, repeat, amount, gid, rgba) VALUES (?, ?, ?, ?, ?, ?, ?, ?)" };
+    SQLite::Statement qryInsert{ *m_db, "INSERT INTO transactions (id, date, description, type, repeat, amount, gid, rgba, transfer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" };
     std::stringstream strAmount;
     strAmount << transaction.getAmount();
     qryInsert.bind(1, transaction.getId());
@@ -271,6 +276,7 @@ bool Account::addTransaction(const Transaction& transaction)
     qryInsert.bind(6, strAmount.str());
     qryInsert.bind(7, transaction.getGroupId());
     qryInsert.bind(8, transaction.getRGBA());
+    qryInsert.bind(9, transaction.getTransferPath());
     if(qryInsert.exec() > 0)
     {
         m_transactions.insert({ transaction.getId(), transaction });
@@ -295,6 +301,7 @@ bool Account::updateTransaction(const Transaction& transaction)
     qryUpdate.bind(5, strAmount.str());
     qryUpdate.bind(6, transaction.getGroupId());
     qryUpdate.bind(7, transaction.getRGBA());
+    qryUpdate.bind(8, transaction.getTransferPath());
     if(qryUpdate.exec() > 0)
     {
         m_transactions[transaction.getId()] = transaction;
@@ -370,6 +377,7 @@ bool Account::exportAsCSV(const std::string& path)
             file << static_cast<int>(pair.second.getRepeatInterval()) << ";";
             file << pair.second.getAmount() << ";";
             file << pair.second.getRGBA() << ";";
+            file << pair.second.getTransferPath() << ";";
             file << pair.second.getGroupId() << ";";
             if (pair.second.getGroupId() != -1)
             {
@@ -467,20 +475,22 @@ int Account::importFromCSV(const std::string& path)
             }
             //Get RGBA
             const std::string& rgba{ fields[6] };
+            //Get Transfer Path
+            const std::string& transferPath{ fields[7] };
             //Get Group Id
             int gid{ 0 };
             try
             {
-                gid = stoui(fields[7]);
+                gid = stoui(fields[8]);
             }
             catch(...)
             {
                 continue;
             }
             //Get Group Name
-            const std::string& groupName{ fields[8] };
+            const std::string& groupName{ fields[9] };
             //Get Group Description
-            const std::string& groupDescription{ fields[9] };
+            const std::string& groupDescription{ fields[10] };
             //Add Transaction
             Transaction transaction{ id };
             transaction.setDate(date);

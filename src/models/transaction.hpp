@@ -138,6 +138,18 @@ namespace NickvisionMoney::Models
          */
         void setRGBA(const std::string& rgba);
         /**
+         * Gets the file path of the account for transfer
+         *
+         * @returns the file path of the account for transfer
+         */
+        const std::string& getTransferPath() const;
+        /**
+         * Sets the file path of the account for transfer
+         *
+         * @param path The new file path of the account for transfer
+         */
+        void setTransferPath(const std::string& path);
+        /**
          * Compares two Transactions via less-than
          *
          * @param toComapre The transaction to compare
@@ -175,5 +187,6 @@ namespace NickvisionMoney::Models
         boost::multiprecision::cpp_dec_float_50 m_amount;
         int m_groupId;
         std::string m_rgba;
+        std::string m_transfer;
     };
 }

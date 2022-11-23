@@ -60,6 +60,7 @@ namespace NickvisionMoney::UI::Views
 		GtkWidget* m_popoverTransferHelp{ nullptr };
 		GtkWidget* m_clampTransferHelp{ nullptr };
 		GtkWidget* m_lblTransferHelp{ nullptr };
+		GtkStringList* m_strListTransfer{ nullptr };
 		GtkEventController* m_eventAmountKey{ nullptr };
 		/**
     	 * Sets the response
@@ -82,5 +83,9 @@ namespace NickvisionMoney::UI::Views
 		 * @param state The bitmask, representing the state of modifier keys and pointer buttons
 		 */
 		void onAmountKeyReleased(unsigned int keyval, GdkModifierType state);
+		/**
+		 * Occurs when a file for transfer should be selected
+		 */
+		void onTransferSelectFile();
  	};
 }

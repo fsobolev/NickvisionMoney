@@ -3,7 +3,7 @@
 
 using namespace NickvisionMoney::Models;
 
-Transaction::Transaction(unsigned int id) : m_id{ id }, m_date{ boost::gregorian::day_clock::local_day() }, m_description{ "" }, m_type{ TransactionType::Income }, m_repeatInterval{ RepeatInterval::Never }, m_amount{ 0.00 }, m_groupId{ -1 }, m_rgba{ "#3584e4" }
+Transaction::Transaction(unsigned int id) : m_id{ id }, m_date{ boost::gregorian::day_clock::local_day() }, m_description{ "" }, m_type{ TransactionType::Income }, m_repeatInterval{ RepeatInterval::Never }, m_amount{ 0.00 }, m_groupId{ -1 }, m_rgba{ "#3584e4" }, m_transfer{ "" }
 {
 
 }
@@ -114,6 +114,16 @@ const std::string& Transaction::getRGBA() const
 void Transaction::setRGBA(const std::string& rgba)
 {
     m_rgba = rgba;
+}
+
+const std::string& Transaction::getTransferPath() const
+{
+    return m_transfer;
+}
+
+void Transaction::setTransferPath(const std::string& path)
+{
+    m_transfer = path;
 }
 
 bool Transaction::operator<(const Transaction& toCompare) const
